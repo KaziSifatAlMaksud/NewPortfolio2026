@@ -324,7 +324,9 @@
   }
   .logo-track::-webkit-scrollbar{display:none;}
   .logo-card{
-    flex:0 0 auto;width:calc((100% - 5 * 18px) / 6);aspect-ratio:4/3;scroll-snap-align:start;
+    flex:0 0 auto;
+    width:calc((100% - 5 * 18px) / 6);
+    aspect-ratio:4/3;scroll-snap-align:start;
     background:var(--panel);border:1px solid var(--line);border-radius:16px;display:flex;align-items:center;
     justify-content:center;padding:26px;cursor:pointer;position:relative;z-index:1;
     transition:transform .45s var(--ease), border-color .45s var(--ease), box-shadow .45s var(--ease), background-color .45s var(--ease), z-index 0s .45s;
@@ -333,8 +335,7 @@
   @media (max-width:760px){ .logo-card{width:calc((100% - 2 * 18px) / 3);} }
   @media (max-width:520px){ .logo-card{width:calc((100% - 1 * 18px) / 2);} }
   .logo-card:hover{
-    transform:scale(1.14);border-color:rgba(61,90,254,.55);
-    box-shadow:0 22px 40px -18px rgba(0,0,0,.6), 0 0 0 1px rgba(61,90,254,.12);
+    border-color:rgba(61,90,254,.55);
     z-index:5;transition:transform .45s var(--ease), border-color .45s var(--ease), box-shadow .45s var(--ease), z-index 0s;
   }
   .logo-card img{max-width:100%;max-height:100%;object-fit:contain;filter:grayscale(1) brightness(1.6) contrast(.9) opacity(.65);transition:filter .45s var(--ease);}
@@ -348,9 +349,9 @@
   .logo-caption{
     position:absolute;left:0;right:0;bottom:-26px;text-align:center;font-family:'IBM Plex Mono',monospace;
     font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);opacity:0;
-    transition:opacity .35s var(--ease), transform .35s var(--ease);transform:translateY(-4px);pointer-events:none;
+    transition:opacity .35s var(--ease), transform .35s var(--ease);pointer-events:none;
   }
-  .logo-card:hover .logo-caption{ opacity:1; transform:translateY(0); }
+  .logo-card:hover .logo-caption{ opacity:1; }
 
   /* ---------- roster section ---------- */
   .roster-section{padding:80px 0 0;position:relative;}
@@ -477,9 +478,9 @@
   <div class="mark">KS AL MAKSUD<span>.</span></div>
   <div class="nav-right">
     <div class="filters" id="navFilters">
-      <button class="active" data-filter="all">All</button>
-      <button data-filter="Branding">Branding</button>
-      <button data-filter="Product">Product</button>
+      <button class="active" data-filter="all">Showcase</button>
+      <button data-filter="Branding">About</button>
+      <button data-filter="Product">Price</button>
     </div>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode" title="Toggle light / dark mode">
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -551,7 +552,7 @@
       <button id="sliderNext" aria-label="Next">→</button>
     </div>
   </div>
-  <div class="logo-viewport reveal">
+  <div class="logo-viewport reveal" >
     <div class="logo-track" id="logoTrack"></div>
   </div>
 </section>
@@ -618,6 +619,9 @@
    from this array. Edit titles / role / category / year / blurb here —
    the placeholder blurbs below are marked TODO and should be swapped for
    your real project write-ups and category labels.
+
+   OPTIONAL: add a `link:"some-page.html"` property to any project to make
+   it open that standalone page instead of the in-page overlay case study.
    ========================================================================= */
 const projects = [
   {
@@ -627,7 +631,8 @@ const projects = [
     cat:"Product",
     img:"nandifoods/nandifoods_dashbord.jpeg",
     accent:"linear-gradient(150deg,#331414,#B15A3E 55%,#EDB79B)",
-    blurb:"TODO — replace with the real Nandi Foods brief: the problem, your approach, and the outcome."
+    blurb:"TODO — replace with the real Nandi Foods brief: the problem, your approach, and the outcome.",
+    link:"flash_innovation_details.html"
   },{
     title:"Flash Innovations",
     role:"Brand & Product Design",
@@ -635,7 +640,9 @@ const projects = [
     cat:"Branding",
     img:"flash-innovations.html.png",
     accent:"linear-gradient(135deg,#1B2A6B,#3D5AFE 55%,#9AA9FF)",
-    blurb:"TODO — replace with the real Flash Innovations brief: the problem, your approach, and the outcome."
+    blurb:"TODO — replace with the real Flash Innovations brief: the problem, your approach, and the outcome.",
+      link:"flash_innovation_details.html"
+   
   },
   {
     title:"Flash Painting Co.",
@@ -644,7 +651,9 @@ const projects = [
     cat:"Branding",
     img:"flashpainting.png",
     accent:"linear-gradient(150deg,#3A2A16,#96A87E 60%,#D9E0C7)",
-    blurb:"TODO — replace with the real Flash Painting Co. brief: the problem, your approach, and the outcome."
+    blurb:"TODO — replace with the real Flash Painting Co. brief: the problem, your approach, and the outcome.",
+     link:"flash_paining_details.html"
+
   },
   {
     title:"Barakah",
@@ -807,6 +816,14 @@ const overlay = document.getElementById('overlay');
 const overlayArt = document.getElementById('overlayArt');
 function openProject(i){
   const p = projects[i];
+
+  /* Projects with a `link` property navigate to their own standalone
+     page instead of opening the in-page overlay. */
+  if(p.link){
+    window.location.href = p.link;
+    return;
+  }
+
   overlayArt.style.backgroundImage = `url('${p.img}')`;
   document.getElementById('csGal1').style.background = p.accent;
   const stops = (p.accent.match(/#[0-9A-Fa-f]{6}/g) || []).slice().reverse().join(',');
@@ -826,7 +843,19 @@ function closeProject(){
 }
 function attachProjectClicks(){
   document.querySelectorAll('[data-project]').forEach(el=>{
-    el.addEventListener('click', ()=>openProject(Number(el.dataset.project)));
+    const p = projects[Number(el.dataset.project)];
+    if(p && p.link){
+      /* Turn linked cards into real anchors so they behave like normal
+         links (open in new tab with ctrl/cmd-click, show the URL on
+         hover, work with right-click "Open in new tab", etc). */
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', (ev)=>{
+        ev.preventDefault();
+        window.location.href = p.link;
+      });
+    } else {
+      el.addEventListener('click', ()=>openProject(Number(el.dataset.project)));
+    }
   });
 }
 attachProjectClicks();
@@ -835,12 +864,12 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeProject(); }
 
 /* ---------- logo slider (trust badges — separate from project roster) ---------- */
 const logos = [
-  { name:"Kite Financial", logo:"logo/Network.png" },
-  { name:"Lumen Studio",   logo:"assets/logos/lumen.png" },
-  { name:"Wander",         logo:"assets/logos/wander.png" },
-  { name:"Motionhouse",    logo:"assets/logos/motionhouse.png" },
-  { name:"Fable",          logo:"assets/logos/fable.png" },
-  { name:"Northbound",     logo:"assets/logos/northbound.png" },
+  { name:"Network Logic", logo:"logo/Network.png" },
+  { name:"NandiFood",   logo:"logo/nandifood.png" },
+  { name:"Flash Painting",         logo:"logo/flashpainting.png" },
+  { name:"Flash Innovation",    logo:"logo/flashinnovation.webp" },
+  { name:"Suvastu Properties ltd.",  logo:"logo/suvastu.svg" },
+  { name:"BSAT",     logo:"logo/Barakah-Logo.png" },
   { name:"MJL Bangladesh", logo:"assets/logos/mjl.png" }
 ];
 function initials(name){
@@ -893,7 +922,15 @@ function renderRoster(){
     </div>
   `).join('');
   document.querySelectorAll('.client-tile').forEach(el=>{
-    el.addEventListener('click', ()=>openProject(Number(el.dataset.project)));
+    const p = projects[Number(el.dataset.project)];
+    if(p && p.link){
+      el.addEventListener('click', (ev)=>{
+        ev.preventDefault();
+        window.location.href = p.link;
+      });
+    } else {
+      el.addEventListener('click', ()=>openProject(Number(el.dataset.project)));
+    }
   });
 }
 renderRoster();
