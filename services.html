@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>
+  (function(){
+    try{
+      var stored = localStorage.getItem('ks-theme');
+      var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
+    }catch(e){
+      document.documentElement.setAttribute('data-theme','dark');
+    }
+  })();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services — Kazi Sifat Al Maksud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0D12;
+    --panel:#14161D;
+    --panel-2:#191C25;
+    --text:#ECE9E2;
+    --muted:#888C97;
+    --line:#262A33;
+    --accent:#3D5AFE;
+    --accent-soft:#B9C2FF;
+    --tag:#96A87E;
+    --warm:#E8B589;
+    --hero-bg:#08090C;
+    --grid-line: rgba(255,255,255,.04);
+    --radius:18px;
+    --ease:cubic-bezier(.22,1,.36,1);
+    --text-on-media:#ECE9E2;
+    --accent-on-media:#B9C2FF;
+    --cursor-fill:#B9C2FF;
+  }
+  html[data-theme="light"]{
+    --bg:#F3F1EA;
+    --panel:#FFFFFF;
+    --panel-2:#F5F3EC;
+    --text:#191A1F;
+    --muted:#6B6E77;
+    --line:#E1DED4;
+    --accent-soft:#3347D1;
+    --tag:#54683F;
+    --warm:#B0703A;
+    --hero-bg:#EFEBE0;
+    --grid-line: rgba(20,20,26,.05);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;
+    overflow-x:hidden;cursor:none;
+    transition:background-color .45s var(--ease), color .45s var(--ease);
+  }
+  @media (pointer:coarse){ body{cursor:auto;} }
+  ::selection{background:var(--accent);color:#fff;}
+  .display{font-family:'Space Grotesk',sans-serif;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;text-decoration:none;}
+
+  #cursor{
+    position:fixed;top:0;left:0;width:14px;height:14px;border-radius:50%;
+    background:var(--accent);pointer-events:none;z-index:999;transform:translate(-50%,-50%);
+    transition:width .3s var(--ease),height .3s var(--ease),background .3s var(--ease);mix-blend-mode:difference;
+  }
+  #cursor.view{width:84px;height:84px;background:var(--cursor-fill);}
+  #cursor .label{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:12px;letter-spacing:.05em;color:#0F1115;opacity:0;
+    transition:opacity .25s var(--ease);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;
+  }
+  #cursor.view .label{opacity:1;}
+  @media (pointer:coarse){ #cursor{display:none;} }
+
+  .wrap{width:100%;max-width:1280px;margin:0 auto;padding:0 40px;position:relative;z-index:1;}
+  @media (max-width:700px){ .wrap{padding:0 22px;} }
+  section{position:relative;}
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease), transform .9s var(--ease);}
+  .reveal.in{opacity:1;transform:translateY(0);}
+
+     nav{
+    position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+    padding:26px 40px;backdrop-filter:blur(10px);
+    background:linear-gradient(to bottom, rgba(11,13,18,.85), rgba(11,13,18,0));
+    transition:background .45s var(--ease);
+  }
+  html[data-theme="light"] nav{ background:linear-gradient(to bottom, rgba(243,241,234,.88), rgba(243,241,234,0)); }
+  @media (max-width:700px){ nav{padding:20px 22px;} }
+  .mark{font-size:18px;font-weight:700;letter-spacing:-.01em;}
+  .mark span{color:var(--accent);}
+  .nav-right{display:flex;align-items:center;gap:12px;}
+  .navlinks{display:flex;gap:28px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);}
+  .navlinks a{transition:color .3s var(--ease);}
+  .navlinks a:hover{color:var(--accent-soft);}
+  @media (max-width:820px){ .navlinks{display:none;} }
+  .menu-toggle {
+    display: none;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+    transition: all .3s ease;
+}
+
+/* Mobile */
+@media (max-width: 820px) {
+
+    .menu-toggle {
+        display: flex;
+    }
+
+    .navlinks {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 22px;
+
+        flex-direction: column;
+        gap: 18px;
+
+        padding: 20px 24px;
+        min-width: 180px;
+
+        background: rgba(11, 13, 18, .95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 12px;
+    }
+
+    .navlinks.active {
+        display: flex;
+    }
+
+    .navlinks a {
+        font-size: 13px;
+    }
+
+    html[data-theme="light"] .navlinks {
+        background: rgba(243, 241, 234, .95);
+    }
+}
+
+/* Hamburger → X */
+.menu-toggle.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+  .theme-toggle{
+    width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--text);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;
+    transition:background .3s var(--ease), border-color .3s var(--ease), color .3s var(--ease), transform .2s var(--ease);
+  }
+  .theme-toggle:hover{border-color:var(--accent);color:var(--accent-soft);}
+  .theme-toggle:active{transform:scale(.9);}
+  .theme-toggle svg{width:18px;height:18px;display:block;}
+  .theme-toggle .icon-moon{display:none;}
+  html[data-theme="light"] .theme-toggle .icon-sun{display:none;}
+  html[data-theme="light"] .theme-toggle .icon-moon{display:block;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:13px 24px;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.02em;cursor:pointer;
+    transition:transform .3s var(--ease), background .3s var(--ease), border-color .3s var(--ease), color .3s var(--ease);
+    border:1px solid var(--line);white-space:nowrap;
+  }
+  .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px -12px rgba(61,90,254,.55);}
+  .btn-ghost{background:transparent;color:var(--text);}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent-soft);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:92svh;display:flex;flex-direction:column;justify-content:center;padding-top:110px;
+    position:relative;overflow:hidden;background:var(--hero-bg);isolation:isolate;
+    transition:background-color .45s var(--ease);
+  }
+  .hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none;}
+  .orb{position:absolute;border-radius:50%;filter:blur(90px);will-change:transform;transition:transform .1s linear, opacity .45s var(--ease);}
+  .orb1{width:480px;height:480px;background:radial-gradient(circle, rgba(61,90,254,.45), transparent 70%);top:-10%;left:-8%;animation:drift1 20s ease-in-out infinite;}
+  .orb2{width:400px;height:400px;background:radial-gradient(circle, rgba(150,168,126,.32), transparent 70%);bottom:-15%;right:-5%;animation:drift2 24s ease-in-out infinite;}
+  .orb3{width:320px;height:320px;background:radial-gradient(circle, rgba(232,181,137,.28), transparent 70%);top:38%;left:52%;animation:drift3 18s ease-in-out infinite;}
+  html[data-theme="light"] .orb{opacity:.55;}
+  @keyframes drift1{0%,100%{transform:translate(0,0);}50%{transform:translate(60px,40px);}}
+  @keyframes drift2{0%,100%{transform:translate(0,0);}50%{transform:translate(-50px,-30px);}}
+  @keyframes drift3{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,50px);}}
+  .grid-overlay{
+    position:absolute;inset:0;
+    background-image:linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:48px 48px;mask-image:radial-gradient(ellipse at center, black 40%, transparent 80%);
+  }
+  @media (prefers-reduced-motion: reduce){ .orb{animation:none;transition:none;} }
+
+  .eyebrow{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--tag);
+    margin-bottom:22px;display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--tag);display:inline-block;}
+  .hero h1{font-size:clamp(38px, 6.4vw, 80px);line-height:1.04;font-weight:600;letter-spacing:-.03em;max-width:18ch;}
+  .hero h1 .rowline{display:block;overflow:hidden;}
+  .hero h1 .rowline span{display:block;transform:translateY(110%);animation:riseUp 1s var(--ease) forwards;}
+  .hero h1 .rowline:nth-child(1) span{animation-delay:.05s;}
+  .hero h1 .rowline:nth-child(2) span{animation-delay:.18s;}
+  .hero h1 em{font-style:normal;color:var(--accent-soft);}
+  @keyframes riseUp{ to{transform:translateY(0);} }
+  .hero p{margin-top:26px;max-width:52ch;color:var(--muted);font-size:17px;line-height:1.7;opacity:0;animation:fadeIn 1s var(--ease) forwards;animation-delay:.6s;}
+  @keyframes fadeIn{ to{opacity:1;} }
+  .hero-ctas{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap;opacity:0;animation:fadeIn 1s var(--ease) forwards;animation-delay:.8s;}
+
+  .hero-stats{
+    display:flex;gap:44px;margin-top:64px;flex-wrap:wrap;opacity:0;animation:fadeIn 1s var(--ease) forwards;animation-delay:1s;
+  }
+  .hero-stats .num{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:600;color:var(--accent-soft);line-height:1;}
+  .hero-stats .lab{margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+
+  /* ---------- section heads ---------- */
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;gap:20px;flex-wrap:wrap;}
+  .section-head h2{font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+  .section-head .title{font-size:clamp(26px,3vw,38px);font-weight:600;letter-spacing:-.02em;margin-top:10px;max-width:20ch;}
+  .count{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted);}
+
+  /* ---------- services (interactive expandable cards) ---------- */
+  .background_services{
+    background:
+      radial-gradient(ellipse 60% 50% at 15% 0%, rgba(61,90,254,.14), transparent 70%),
+      radial-gradient(ellipse 50% 40% at 100% 100%, rgba(150,168,126,.10), transparent 70%);
+  }
+  .services{padding:100px 0 60px;}
+  .service-list{display:flex;flex-direction:column;gap:18px;}
+  .service{
+    border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden;
+    transition:border-color .4s var(--ease), background-color .45s var(--ease);
+  }
+  .service.open{border-color:rgba(61,90,254,.5);}
+  .service-head{
+    display:flex;align-items:center;gap:26px;padding:30px 34px;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .service-num{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted);flex:0 0 auto;width:34px;}
+  .service-icon{
+    width:52px;height:52px;border-radius:14px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+    background:var(--panel-2);border:1px solid var(--line);color:var(--accent-soft);
+    transition:background .35s var(--ease), border-color .35s var(--ease), transform .4s var(--ease);
+  }
+  .service.open .service-icon{background:var(--accent);color:#fff;border-color:var(--accent);transform:rotate(-6deg);}
+  .service-icon svg{width:24px;height:24px;}
+  .service-title{flex:1 1 auto;min-width:200px;}
+  .service-title h3{font-size:clamp(19px,2.2vw,26px);font-weight:600;letter-spacing:-.01em;}
+  .service-title p{color:var(--muted);font-size:14px;margin-top:5px;max-width:52ch;}
+  .service-plus{
+    width:38px;height:38px;border-radius:50%;border:1px solid var(--line);flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;position:relative;
+    transition:border-color .35s var(--ease), transform .45s var(--ease), background .35s var(--ease);
+  }
+  .service.open .service-plus{transform:rotate(135deg);border-color:var(--accent);background:var(--accent);}
+  .service-plus::before,.service-plus::after{content:"";position:absolute;background:var(--text);transition:background .35s var(--ease);}
+  .service-plus::before{width:14px;height:1.5px;}
+  .service-plus::after{width:1.5px;height:14px;}
+  .service.open .service-plus::before,.service.open .service-plus::after{background:#fff;}
+  @media (max-width:700px){ .service-head{padding:22px 20px;gap:16px;} .service-num{display:none;} }
+
+  .service-body{max-height:0;overflow:hidden;transition:max-height .55s var(--ease);}
+  .service.open .service-body{max-height:600px;}
+  .service-body-inner{padding:0 34px 36px 96px;display:grid;grid-template-columns:1.3fr 1fr;gap:40px;}
+  @media (max-width:900px){ .service-body-inner{grid-template-columns:1fr;padding:0 20px 30px 20px;} }
+  @media (min-width:701px) and (max-width:900px){ .service-body-inner{padding:0 34px 36px 34px;} }
+
+  .service-deliver h4, .service-stack h4{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--tag);margin-bottom:16px;
+  }
+  .service-deliver ul{list-style:none;display:flex;flex-direction:column;gap:12px;}
+  .service-deliver li{display:flex;gap:12px;font-size:15px;color:var(--text);line-height:1.5;}
+  .service-deliver li::before{
+    content:"";flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-top:7px;
+  }
+  .chip-cloud{display:flex;flex-wrap:wrap;gap:9px;}
+  .chip{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.02em;color:var(--muted);
+    border:1px solid var(--line);background:var(--panel-2);padding:7px 13px;border-radius:999px;
+    transition:border-color .3s var(--ease), color .3s var(--ease), transform .3s var(--ease);
+  }
+  .chip:hover{border-color:var(--accent);color:var(--accent-soft);transform:translateY(-2px);}
+
+  /* ---------- process ---------- */
+  .process-section{padding:100px 0;}
+  .process-section::before{
+    content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;
+    background-image:radial-gradient(rgba(236,233,226,.08) 1px, transparent 1px);background-size:26px 26px;
+    mask-image:radial-gradient(ellipse 80% 70% at 50% 30%, black 0%, transparent 75%);
+  }
+  html[data-theme="light"] .process-section::before{ background-image:radial-gradient(rgba(20,20,26,.10) 1px, transparent 1px); }
+  .process-track{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;position:relative;}
+  @media (max-width:1000px){ .process-track{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .process-track{grid-template-columns:1fr;} }
+  .process-step{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px 22px;
+    transition:transform .4s var(--ease), border-color .4s var(--ease), background-color .45s var(--ease);
+  }
+  .process-step:hover{transform:translateY(-6px);border-color:rgba(61,90,254,.5);}
+  .process-step .pnum{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:600;color:var(--accent-soft);}
+  .process-step h4{margin-top:14px;font-size:16.5px;font-weight:600;letter-spacing:-.01em;}
+  .process-step p{margin-top:8px;font-size:13.5px;color:var(--muted);line-height:1.6;}
+
+  /* ---------- pricing ---------- */
+  .background_pricing{
+    background:linear-gradient(90deg, rgba(61,90,254,.06), transparent 30%, transparent 70%, rgba(150,168,126,.06));
+  }
+  .pricing-section{padding:100px 0;}
+  .price-toggle{
+    display:inline-flex;gap:4px;background:rgba(255,255,255,.03);border:1px solid var(--line);
+    border-radius:999px;padding:4px;margin-bottom:8px;
+  }
+  html[data-theme="light"] .price-toggle{background:rgba(20,20,26,.03);}
+  .price-toggle button{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.03em;text-transform:uppercase;
+    color:var(--muted);background:transparent;border:none;padding:9px 18px;border-radius:999px;cursor:pointer;
+    transition:background .3s var(--ease), color .3s var(--ease);
+  }
+  .price-toggle button.active{background:var(--accent);color:#fff;}
+
+  .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:40px;}
+  @media (max-width:920px){ .price-grid{grid-template-columns:1fr;} }
+  .price-card{
+    border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:34px 30px;
+    display:flex;flex-direction:column;transition:transform .4s var(--ease), border-color .4s var(--ease), background-color .45s var(--ease);
+  }
+  .price-card:hover{transform:translateY(-6px);}
+  .price-card.highlight{border-color:var(--accent);background:var(--panel-2);position:relative;}
+  .price-card.highlight::before{
+    content:"Most booked";position:absolute;top:-13px;right:28px;background:var(--accent);color:#fff;
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+    padding:6px 12px;border-radius:999px;
+  }
+  .price-card h3{font-size:19px;font-weight:600;}
+  .price-card .pdesc{color:var(--muted);font-size:13.5px;margin-top:8px;min-height:36px;}
+  .price-card .amount{margin-top:22px;display:flex;align-items:baseline;gap:6px;}
+  .price-card .amount .num{font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:600;letter-spacing:-.02em;}
+  .price-card .amount .per{font-size:12.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+  .price-card ul{list-style:none;margin:26px 0 30px;display:flex;flex-direction:column;gap:12px;flex:1;}
+  .price-card li{display:flex;gap:10px;font-size:14px;line-height:1.5;}
+  .price-card li::before{content:"✓";color:var(--accent-soft);font-weight:600;flex:0 0 auto;}
+  .price-card .btn{justify-content:center;width:100%;}
+
+  /* ---------- faq ---------- */
+  .faq-section{padding:0 0 110px;}
+  .faq-list{display:flex;flex-direction:column;gap:14px;max-width:820px;}
+  .faq-item{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden;transition:border-color .35s var(--ease);}
+  .faq-item.open{border-color:rgba(61,90,254,.5);}
+  .faq-q{
+    display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 26px;cursor:pointer;
+    font-size:15.5px;font-weight:500;
+  }
+  .faq-q .qplus{
+    width:28px;height:28px;border-radius:50%;border:1px solid var(--line);flex:0 0 auto;position:relative;
+    transition:transform .4s var(--ease), border-color .35s var(--ease), background .35s var(--ease);
+  }
+  .faq-item.open .qplus{transform:rotate(135deg);background:var(--accent);border-color:var(--accent);}
+  .faq-q .qplus::before,.faq-q .qplus::after{content:"";position:absolute;top:50%;left:50%;background:var(--text);transform:translate(-50%,-50%);transition:background .35s var(--ease);}
+  .faq-q .qplus::before{width:11px;height:1.4px;}
+  .faq-q .qplus::after{width:1.4px;height:11px;}
+  .faq-item.open .qplus::before,.faq-item.open .qplus::after{background:#fff;}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .5s var(--ease);}
+  .faq-item.open .faq-a{max-height:220px;}
+  .faq-a p{padding:0 26px 24px;color:var(--muted);font-size:14.5px;line-height:1.7;max-width:64ch;}
+
+  /* ---------- footer ---------- */
+  footer{
+    border-top:1px solid var(--line);padding:80px 0 46px;display:flex;justify-content:space-between;
+    align-items:center;flex-wrap:wrap;gap:18px;position:relative;overflow:hidden;
+  }
+  footer::before{
+    content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);width:900px;height:400px;z-index:0;
+    background:radial-gradient(ellipse at center, rgba(232,181,137,.14), transparent 65%);pointer-events:none;
+  }
+  footer > *{ position:relative; z-index:1; }
+  footer .big{font-size:clamp(24px,4vw,40px);font-weight:600;letter-spacing:-.02em;}
+  footer .contact-link{
+    display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:999px;
+    padding:12px 22px;font-size:14px;transition:border-color .3s var(--ease), color .3s var(--ease);
+  }
+  footer .contact-link:hover{ border-color:var(--accent); color:var(--accent-soft); }
+  footer small{ color:var(--muted); font-size:12px; }
+</style>
+</head>
+<body>
+
+<div id="cursor"><span class="label">View</span></div>
+
+<nav>
+    <div class="mark">KS AL MAKSUD<span>.</span></div>
+
+    <div class="nav-right">
+        <div class="navlinks">
+            <a href="index.html">Showcase</a>
+            <a href="services.html">Services</a>
+            <a href="services.html#pricing">Pricing</a>
+            <a href="contact.html">Contact Me</a>
+        </div>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Open navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+           <button class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode" title="Toggle light / dark mode">
+              <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+              </svg>
+              <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+    </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg" id="heroBg">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+  <div class="wrap">
+    <div class="eyebrow">Services — 2026</div>
+    <h1 class="display">
+      <span class="rowline"><span>Systems, apps and</span></span>
+      <span class="rowline"><span>design that <em>ship.</em></span></span>
+    </h1>
+    <p>I build the backend, the app, and the visuals a growing business actually needs — Laravel-powered ERP/CRM systems, Flutter mobile apps, and the marketing design to launch them. One person, three disciplines, one accountable process.</p>
+    <div class="hero-ctas">
+      <a href="mailto:kazi.sifat2013@gmail.com" class="btn btn-primary">Start a project →</a>
+      <a href="#pricing" class="btn btn-ghost">See pricing</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="num">3</div><div class="lab">Core disciplines</div></div>
+      <div><div class="num">7+</div><div class="lab">Systems shipped</div></div>
+      <div><div class="num">48h</div><div class="lab">Avg. reply time</div></div>
+      <div><div class="num">4.9</div><div class="lab">Client rating</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="background_services">
+  <section class="services wrap" id="services">
+    <div class="section-head reveal">
+      <div>
+        <h2>What I do</h2>
+        <div class="title">Three disciplines, one build.</div>
+      </div>
+      <span class="count">01 – 03</span>
+    </div>
+
+    <div class="service-list">
+
+      <!-- 01 — Web / ERP / CRM -->
+      <div class="service open" data-service="0">
+        <div class="service-head">
+          <span class="service-num mono">01</span>
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"></rect><path d="M3 9h18M8 4v5"></path></svg>
+          </div>
+          <div class="service-title">
+            <h3 class="display">Web, ERP &amp; CRM Development</h3>
+            <p>Custom business systems and websites built on Laravel — the backend that runs your operations, not just a brochure site.</p>
+          </div>
+          <span class="service-plus"></span>
+        </div>
+        <div class="service-body">
+          <div class="service-body-inner">
+            <div class="service-deliver">
+              <h4>What you get</h4>
+              <ul>
+                <li>Custom ERP systems for inventory, orders, HR and accounting</li>
+                <li>CRM tools to track leads, clients and follow-ups in one place</li>
+                <li>Business, e-commerce and portfolio websites built from scratch</li>
+                <li>Admin dashboards, role-based access and reporting</li>
+                <li>AJAX-driven interfaces — no full page reloads, instant feedback</li>
+                <li>Database design, API integrations and third-party payments</li>
+              </ul>
+            </div>
+            <div class="service-stack">
+              <h4>Stack</h4>
+              <div class="chip-cloud">
+                <span class="chip">Laravel</span><span class="chip">PHP</span><span class="chip">MySQL</span>
+                <span class="chip">AJAX</span><span class="chip">jQuery</span><span class="chip">Blade</span>
+                <span class="chip">REST APIs</span><span class="chip">Livewire</span><span class="chip">Bootstrap</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 02 — Mobile App Development -->
+      <div class="service" data-service="1">
+        <div class="service-head">
+          <span class="service-num mono">02</span>
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"></rect><path d="M11 18h2"></path></svg>
+          </div>
+          <div class="service-title">
+            <h3 class="display">Mobile App Development</h3>
+            <p>Cross-platform apps in Flutter, wired to a real backend — not a static prototype.</p>
+          </div>
+          <span class="service-plus"></span>
+        </div>
+        <div class="service-body">
+          <div class="service-body-inner">
+            <div class="service-deliver">
+              <h4>What you get</h4>
+              <ul>
+                <li>One Flutter codebase shipped to both iOS and Android</li>
+                <li>REST API integration with your Laravel or existing backend</li>
+                <li>Firebase setup — auth, push notifications, realtime database, storage</li>
+                <li>State management, offline support and clean navigation</li>
+                <li>Play Store / App Store build and submission support</li>
+                <li>Ongoing updates and bug-fix support after launch</li>
+              </ul>
+            </div>
+            <div class="service-stack">
+              <h4>Stack</h4>
+              <div class="chip-cloud">
+                <span class="chip">Flutter</span><span class="chip">Dart</span><span class="chip">REST API</span>
+                <span class="chip">Firebase</span><span class="chip">Firestore</span><span class="chip">Push Notifications</span>
+                <span class="chip">Provider / Bloc</span><span class="chip">Google Maps SDK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 03 — Design & Marketing -->
+      <div class="service" data-service="2">
+        <div class="service-head">
+          <span class="service-num mono">03</span>
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+          </div>
+          <div class="service-title">
+            <h3 class="display">Design &amp; Marketing</h3>
+            <p>The visual layer that makes a launch land — pixel tracking, ad creatives and print-ready design.</p>
+          </div>
+          <span class="service-plus"></span>
+        </div>
+        <div class="service-body">
+          <div class="service-body-inner">
+            <div class="service-deliver">
+              <h4>What you get</h4>
+              <ul>
+                <li>Meta / TikTok / GTM pixel setup and conversion event tracking</li>
+                <li>Flyer, poster and social ad creative for campaigns</li>
+                <li>Banner sets for web, display ads and storefronts</li>
+                <li>E-brochure and catalogue design, print and digital ready</li>
+                <li>Logo and brand identity kits for new businesses</li>
+                <li>Social media post templates and content packs</li>
+              </ul>
+            </div>
+            <div class="service-stack">
+              <h4>Tools</h4>
+              <div class="chip-cloud">
+                <span class="chip">Meta Pixel</span><span class="chip">GTM</span><span class="chip">Figma</span>
+                <span class="chip">Photoshop</span><span class="chip">Illustrator</span><span class="chip">Canva</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<section class="process-section wrap" id="process">
+  <div class="section-head reveal">
+    <div>
+      <h2>How a project runs</h2>
+      <div class="title">Five stages, start to launch.</div>
+    </div>
+    <span class="count">01 – 05</span>
+  </div>
+  <div class="process-track">
+    <div class="process-step reveal in">
+      <div class="pnum">01</div>
+      <h4>Discover</h4>
+      <p>We define the actual problem, users and scope before anything is designed or coded.</p>
+    </div>
+    <div class="process-step reveal in">
+      <div class="pnum">02</div>
+      <h4>Plan &amp; design</h4>
+      <p>Database schema, screens and flows are mapped out and shared for sign-off.</p>
+    </div>
+    <div class="process-step reveal in">
+      <div class="pnum">03</div>
+      <h4>Build</h4>
+      <p>Development happens in visible milestones — you see progress, not a black box.</p>
+    </div>
+    <div class="process-step reveal in">
+      <div class="pnum">04</div>
+      <h4>Test</h4>
+      <p>QA across devices and edge cases before anything reaches your users.</p>
+    </div>
+    <div class="process-step reveal in">
+      <div class="pnum">05</div>
+      <h4>Launch &amp; support</h4>
+      <p>Deployment, handover, and a support window for fixes and small changes.</p>
+    </div>
+  </div>
+</section>
+
+<div class="background_pricing">
+  <section class="pricing-section wrap" id="pricing">
+    <div class="section-head reveal">
+      <div>
+        <h2>Pricing</h2>
+        <div class="title">Straightforward packages.</div>
+      </div>
+      <div class="price-toggle" id="priceToggle">
+        <button class="active" data-mode="project">Per project</button>
+        <button data-mode="monthly">Monthly retainer</button>
+      </div>
+    </div>
+
+    <div class="price-grid reveal in">
+      <div class="price-card">
+        <h3 class="display">Starter</h3>
+        <div class="pdesc">A focused website or single-feature app to get moving fast.</div>
+        <div class="amount">
+          <span class="num mono price-project">$350</span>
+          <span class="num mono price-monthly" style="display:none;">$250</span>
+          <span class="per">/ <span class="price-unit-label">project</span></span>
+        </div>
+        <ul>
+          <li>Business website or landing page</li>
+          <li>Up to 5 pages, mobile responsive</li>
+          <li>Basic AJAX contact / inquiry forms</li>
+          <li>1 round of revisions</li>
+          <li>2 weeks of post-launch support</li>
+        </ul>
+        <a href="mailto:kazi.sifat2013@gmail.com?subject=Starter%20package%20inquiry" class="btn btn-ghost">Get started</a>
+      </div>
+
+      <div class="price-card highlight">
+        <h3 class="display">Business</h3>
+        <div class="pdesc">A full ERP/CRM system or a launch-ready mobile app.</div>
+        <div class="amount">
+          <span class="num mono price-project">$1,200</span>
+          <span class="num mono price-monthly" style="display:none;">$650</span>
+          <span class="per">/ <span class="price-unit-label">project</span></span>
+        </div>
+        <ul>
+          <li>Custom Laravel ERP / CRM or Flutter app</li>
+          <li>REST API + database architecture</li>
+          <li>Admin dashboard with role-based access</li>
+          <li>3 rounds of revisions</li>
+          <li>1 month of post-launch support</li>
+        </ul>
+        <a href="mailto:kazi.sifat2013@gmail.com?subject=Business%20package%20inquiry" class="btn btn-primary">Get started</a>
+      </div>
+
+      <div class="price-card">
+        <h3 class="display">Enterprise</h3>
+        <div class="pdesc">A full system + app + brand rollout, scoped together.</div>
+        <div class="amount">
+          <span class="num mono price-project">Custom</span>
+          <span class="num mono price-monthly" style="display:none;">Custom</span>
+          <span class="per">/ <span class="price-unit-label">scope</span></span>
+        </div>
+        <ul>
+          <li>Web system + mobile app, shared backend</li>
+          <li>Full brand and marketing asset kit</li>
+          <li>Priority delivery and dedicated check-ins</li>
+          <li>Unlimited revisions within scope</li>
+          <li>Ongoing retainer support available</li>
+        </ul>
+        <a href="mailto:kazi.sifat2013@gmail.com?subject=Enterprise%20package%20inquiry" class="btn btn-ghost">Talk scope</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<section class="faq-section wrap" id="faq">
+  <div class="section-head reveal">
+    <div>
+      <h2>FAQ</h2>
+      <div class="title">Before you reach out.</div>
+    </div>
+  </div>
+  <div class="faq-list reveal in">
+    <div class="faq-item">
+      <div class="faq-q">Do you work with clients outside Bangladesh?<span class="qplus"></span></div>
+      <div class="faq-a"><p>Yes — most communication happens over email and calls, so timezone is rarely a blocker. Payments can be arranged via bank transfer or common online payment methods.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can you take over an existing Laravel project?<span class="qplus"></span></div>
+      <div class="faq-a"><p>Yes. I'll review the codebase first, flag any structural issues, and give you an honest estimate before committing to changes or new features.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Do you build the backend and the app together?<span class="qplus"></span></div>
+      <div class="faq-a"><p>That's the most efficient setup — a Laravel REST API paired with a Flutter app means one shared source of truth for your data, instead of two disconnected systems.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What do you need from me to start?<span class="qplus"></span></div>
+      <div class="faq-a"><p>A short brief of the problem you're solving, any existing brand assets, and access to relevant accounts (hosting, Firebase, etc.) once we agree on scope.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Do you offer support after launch?<span class="qplus"></span></div>
+      <div class="faq-a"><p>Every package includes a support window for fixes. Ongoing monthly retainers are available for ongoing updates, monitoring and new features.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div class="big display">Have a project<br>in mind?</div>
+  <a class="contact-link mono" href="mailto:kazi.sifat2013@gmail.com">kazi.sifat2013@gmail.com ↗</a>
+  <small class="mono">© 2026 — Kazi Sifat Al Maksud</small>
+</footer>
+
+<script>
+/* ---------- theme toggle ---------- */
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  const next = current === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  try{ localStorage.setItem('ks-theme', next); }catch(e){}
+});
+
+/* ---------- custom cursor ---------- */
+const cursor = document.getElementById('cursor');
+if(matchMedia('(pointer:fine)').matches){
+  window.addEventListener('mousemove', e=>{
+    cursor.style.left = e.clientX+'px';
+    cursor.style.top = e.clientY+'px';
+  });
+  function bindCursorHover(el){
+    el.addEventListener('mouseenter', ()=>cursor.classList.add('view'));
+    el.addEventListener('mouseleave', ()=>cursor.classList.remove('view'));
+  }
+  document.querySelectorAll('.contact-link, .close-btn, .theme-toggle, .btn, .service-head, .faq-q, .price-card').forEach(bindCursorHover);
+}
+
+/* ---------- scroll reveal ---------- */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+  });
+},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ---------- hero orb parallax ---------- */
+const heroBg = document.getElementById('heroBg');
+const orbs = heroBg.querySelectorAll('.orb');
+const depths = [40, 25, 15];
+let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+heroBg.closest('.hero').addEventListener('mousemove', (e)=>{
+  const rect = e.currentTarget.getBoundingClientRect();
+  mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+  mouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+});
+function animateOrbs(){
+  targetX += (mouseX - targetX) * 0.05;
+  targetY += (mouseY - targetY) * 0.05;
+  orbs.forEach((orb, i)=>{
+    const depth = depths[i];
+    orb.style.transform = `translate(${targetX * depth}px, ${targetY * depth}px)`;
+  });
+  requestAnimationFrame(animateOrbs);
+}
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) animateOrbs();
+
+/* ---------- services accordion ---------- */
+document.querySelectorAll('.service-head').forEach(head=>{
+  head.addEventListener('click', ()=>{
+    const service = head.closest('.service');
+    const wasOpen = service.classList.contains('open');
+    document.querySelectorAll('.service').forEach(s=>s.classList.remove('open'));
+    if(!wasOpen) service.classList.add('open');
+  });
+});
+
+/* ---------- pricing toggle ---------- */
+const priceToggle = document.getElementById('priceToggle');
+priceToggle.addEventListener('click', e=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  document.querySelectorAll('#priceToggle button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const mode = btn.dataset.mode;
+  const showMonthly = mode === 'monthly';
+  document.querySelectorAll('.price-project').forEach(el=> el.style.display = showMonthly ? 'none' : 'inline');
+  document.querySelectorAll('.price-monthly').forEach(el=> el.style.display = showMonthly ? 'inline' : 'none');
+  document.querySelectorAll('.price-unit-label').forEach(el=> el.textContent = showMonthly ? 'month' : 'project');
+});
+
+/* ---------- faq accordion ---------- */
+document.querySelectorAll('.faq-q').forEach(q=>{
+  q.addEventListener('click', ()=>{
+    const item = q.closest('.faq-item');
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(f=>f.classList.remove('open'));
+    if(!wasOpen) item.classList.add('open');
+  });
+});
+</script>
+<script>
+    const menuToggle = document.getElementById('menuToggle');
+    const navlinks = document.querySelector('.navlinks');
+
+    menuToggle.addEventListener('click', function () {
+        menuToggle.classList.toggle('active');
+        navlinks.classList.toggle('active');
+    });
+
+    // Close menu after clicking a link
+    document.querySelectorAll('.navlinks a').forEach(link => {
+        link.addEventListener('click', function () {
+            menuToggle.classList.remove('active');
+            navlinks.classList.remove('active');
+        });
+    });
+</script>
+</body>
+</html>
