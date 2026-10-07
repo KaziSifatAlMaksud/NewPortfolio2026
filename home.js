@@ -12,7 +12,7 @@ const projects = [
     img:"nandifoods/nandifoods_dashbord.jpeg",
     accent:"linear-gradient(150deg,#331414,#B15A3E 55%,#EDB79B)",
     blurb:"TODO — replace with the real Nandi Foods brief: the problem, your approach, and the outcome.",
-    link:"flash_innovation_details.html" /* TODO: probably should be its own page, e.g. nandi_foods_details.html */
+    link:"flash_innovation_details.html" /* TODO: this points at the Flash Innovations page — create nandi_foods_details.html and update it */
   },
   {
     title:"Flash Innovations",
@@ -74,9 +74,17 @@ const projects = [
 
 const total  = projects.length;
 const padded = n => String(n).padStart(2,'0');
+const prefersReducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canHover = matchMedia('(hover:hover) and (pointer:fine)').matches;
+
 function initials(name){
   return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 }
+/* Image on top, the project's gradient underneath — if an image path is wrong
+   or still loading, you see the colour gradient instead of an empty box. */
+function artBg(p){ return `url('${p.img}'), ${p.accent}`; }
+/* Escape text before putting it in innerHTML */
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ---------- theme toggle ---------- */
 document.getElementById('themeToggle').addEventListener('click', ()=>{
@@ -89,26 +97,31 @@ document.getElementById('themeToggle').addEventListener('click', ()=>{
 /* ---------- mobile menu ---------- */
 const menuToggle = document.getElementById('menuToggle');
 const navlinks   = document.getElementById('navlinks');
-menuToggle.addEventListener('click', ()=>{
-  menuToggle.classList.toggle('active');
-  navlinks.classList.toggle('active');
+function setMenu(open){
+  menuToggle.classList.toggle('active', open);
+  navlinks.classList.toggle('active', open);
+  menuToggle.setAttribute('aria-expanded', String(open));
+  menuToggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+}
+menuToggle.addEventListener('click', ()=> setMenu(!navlinks.classList.contains('active')));
+navlinks.querySelectorAll('a').forEach(link=> link.addEventListener('click', ()=> setMenu(false)));
+/* close when tapping outside the menu */
+document.addEventListener('click', e=>{
+  if(navlinks.classList.contains('active') && !e.target.closest('nav')) setMenu(false);
 });
-navlinks.querySelectorAll('a').forEach(link=>{
-  link.addEventListener('click', ()=>{
-    menuToggle.classList.remove('active');
-    navlinks.classList.remove('active');
-  });
-});
+/* close automatically if the window grows past the mobile breakpoint */
+matchMedia('(min-width:821px)').addEventListener('change', e=>{ if(e.matches) setMenu(false); });
 
 /* ---------- featured project (projects[0]) ---------- */
 function renderFeatured(){
   const p = projects[0];
-  document.getElementById('featureArt').style.backgroundImage = `url('${p.img}')`;
+  document.getElementById('featureArt').style.backgroundImage = artBg(p);
   document.getElementById('featureBadge').textContent = '01 · Featured';
   document.getElementById('featureTitle').textContent = p.title;
   document.getElementById('featureMeta').textContent  = `${p.role} · ${p.year}`;
   document.getElementById('featuredCount').textContent = `01 / ${padded(total)}`;
   document.getElementById('gridCount').textContent     = `02 – ${padded(total)}`;
+  document.querySelector('.feature-card').setAttribute('aria-label', `Open case study: ${p.title}`);
 }
 renderFeatured();
 
@@ -118,18 +131,18 @@ function renderGrid(){
   grid.innerHTML = projects.slice(1).map((p,i)=>{
     const idx = i + 1;
     return `
-    <div class="card reveal in" data-project="${idx}" data-cat="${p.cat}">
+    <div class="card reveal in" data-project="${idx}" data-cat="${esc(p.cat)}" role="button" tabindex="0" aria-label="Open case study: ${esc(p.title)}">
       <div class="thumb">
-        <div class="art" style="background-image:url('${p.img}')"></div>
-        <span class="glass-label thumb-badge">${padded(idx+1)} · ${p.cat}</span>
-        <span class="glass-label thumb-year">${p.year}</span>
+        <div class="art" style="background-image:${artBg(p)}"></div>
+        <span class="glass-label thumb-badge">${padded(idx+1)} · ${esc(p.cat)}</span>
+        <span class="glass-label thumb-year">${esc(p.year)}</span>
       </div>
       <div class="body">
         <div>
-          <h4 class="display">${p.title}</h4>
-          <div class="tags">${p.role} · ${p.cat} · ${p.year}</div>
+          <h4 class="display">${esc(p.title)}</h4>
+          <div class="tags">${esc(p.role)} · ${esc(p.cat)} · ${esc(p.year)}</div>
         </div>
-        <span class="arrow">↗</span>
+        <span class="arrow" aria-hidden="true">↗</span>
       </div>
     </div>`;
   }).join('');
@@ -139,13 +152,15 @@ renderGrid();
 /* ---------- overlay case study ---------- */
 const overlay    = document.getElementById('overlay');
 const overlayArt = document.getElementById('overlayArt');
+const closeBtn   = document.getElementById('closeBtn');
+let lastFocus = null;
 
 function openProject(i){
   const p = projects[i];
   if(!p) return;
   if(p.link){ window.location.href = p.link; return; }
 
-  overlayArt.style.backgroundImage = `url('${p.img}')`;
+  overlayArt.style.backgroundImage = artBg(p);
   document.getElementById('csGal1').style.background = p.accent;
   const stops = (p.accent.match(/#[0-9A-Fa-f]{6}/g) || []).slice().reverse().join(',');
   document.getElementById('csGal2').style.background = stops ? `linear-gradient(60deg,${stops})` : p.accent;
@@ -153,17 +168,26 @@ function openProject(i){
   document.getElementById('csRole').textContent  = p.role;
   document.getElementById('csYear').textContent  = p.year;
   document.getElementById('csCat').textContent   = p.cat;
-  document.getElementById('csText').innerHTML    = '<p>' + p.blurb + '</p>';
+  document.getElementById('csText').innerHTML    = '<p>' + esc(p.blurb) + '</p>';
+
+  lastFocus = document.activeElement;
   overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
   document.body.classList.add('locked');
   overlay.scrollTop = 0;
+  setTimeout(()=> closeBtn.focus({ preventScroll:true }), 350);
 }
 function closeProject(){
+  if(!overlay.classList.contains('open')) return;
   overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden','true');
   document.body.classList.remove('locked');
+  if(lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll:true });
 }
-document.getElementById('closeBtn').addEventListener('click', closeProject);
-document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeProject(); });
+closeBtn.addEventListener('click', closeProject);
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape'){ closeProject(); setMenu(false); }
+});
 
 /* One delegated click handler covers featured card, grid cards AND roster tiles,
    even though some of them are rendered after page load. */
@@ -171,14 +195,20 @@ document.addEventListener('click', e=>{
   const el = e.target.closest('[data-project]');
   if(el) openProject(Number(el.dataset.project));
 });
+/* keyboard: Enter / Space activates any card */
+document.addEventListener('keydown', e=>{
+  if(e.key !== 'Enter' && e.key !== ' ') return;
+  const el = e.target.closest && e.target.closest('[data-project]');
+  if(el && el === e.target){ e.preventDefault(); openProject(Number(el.dataset.project)); }
+});
 
-/* ---------- custom cursor (delegated, so dynamic items work too) ---------- */
+/* ---------- custom cursor (mouse only) ---------- */
 const cursor = document.getElementById('cursor');
-if(matchMedia('(pointer:fine)').matches){
+if(canHover){
   window.addEventListener('mousemove', e=>{
     cursor.style.left = e.clientX + 'px';
     cursor.style.top  = e.clientY + 'px';
-  });
+  }, { passive:true });
   const hoverSel = '.card, .feature-card, .client-tile, .logo-card, .contact-link, .close-btn, .theme-toggle';
   document.addEventListener('mouseover', e=>{
     if(e.target.closest(hoverSel)) cursor.classList.add('view');
@@ -191,32 +221,50 @@ if(matchMedia('(pointer:fine)').matches){
   });
 }
 
-/* ---------- featured parallax ---------- */
+/* ---------- featured parallax (throttled with rAF, skipped for reduced motion) ---------- */
 const featArt = document.getElementById('featureArt');
-window.addEventListener('scroll', ()=>{
-  const r = featArt.parentElement.getBoundingClientRect();
-  featArt.style.transform = `translateY(${(window.innerHeight - r.top) * 0.06}px)`;
-});
+if(!prefersReducedMotion){
+  let ticking = false;
+  const strength = ()=> window.innerWidth < 700 ? 0.03 : 0.06; /* gentler on phones */
+  function updateParallax(){
+    const r = featArt.parentElement.getBoundingClientRect();
+    if(r.bottom > 0 && r.top < window.innerHeight){
+      featArt.style.transform = `translateY(${(window.innerHeight - r.top) * strength()}px)`;
+    }
+    ticking = false;
+  }
+  window.addEventListener('scroll', ()=>{
+    if(!ticking){ ticking = true; requestAnimationFrame(updateParallax); }
+  }, { passive:true });
+  updateParallax();
+}
 
-/* ---------- hero orb mouse parallax ---------- */
+/* ---------- hero orb mouse parallax (mouse only, pauses when hero is off-screen) ---------- */
 const heroBg = document.getElementById('heroBg');
 const orbs   = heroBg.querySelectorAll('.orb');
 const depths = [40, 25, 15];
-let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
-heroBg.closest('.hero').addEventListener('mousemove', e=>{
-  const rect = e.currentTarget.getBoundingClientRect();
-  mouseX = ((e.clientX - rect.left) / rect.width  - 0.5) * 2;
-  mouseY = ((e.clientY - rect.top)  / rect.height - 0.5) * 2;
-});
-function animateOrbs(){
-  targetX += (mouseX - targetX) * 0.05;
-  targetY += (mouseY - targetY) * 0.05;
-  orbs.forEach((orb,i)=>{
-    orb.style.transform = `translate(${targetX * depths[i]}px, ${targetY * depths[i]}px)`;
-  });
-  requestAnimationFrame(animateOrbs);
+let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0, heroVisible = true;
+
+if(canHover && !prefersReducedMotion){
+  const hero = heroBg.closest('.hero');
+  hero.addEventListener('mousemove', e=>{
+    const rect = hero.getBoundingClientRect();
+    mouseX = ((e.clientX - rect.left) / rect.width  - 0.5) * 2;
+    mouseY = ((e.clientY - rect.top)  / rect.height - 0.5) * 2;
+  }, { passive:true });
+  new IntersectionObserver(([en])=>{ heroVisible = en.isIntersecting; }).observe(hero);
+
+  (function animateOrbs(){
+    if(heroVisible){
+      targetX += (mouseX - targetX) * 0.05;
+      targetY += (mouseY - targetY) * 0.05;
+      orbs.forEach((orb,i)=>{
+        orb.style.transform = `translate(${targetX * depths[i]}px, ${targetY * depths[i]}px)`;
+      });
+    }
+    requestAnimationFrame(animateOrbs);
+  })();
 }
-if(!matchMedia('(prefers-reduced-motion: reduce)').matches) animateOrbs();
 
 /* =========================================================================
    SLIDING CLIENT LOGOS
@@ -244,11 +292,14 @@ function renderLogos(){
     const img = document.createElement('img');
     img.src = l.logo;
     img.alt = l.name + ' logo';
+    img.loading = 'lazy';
     img.draggable = false;
     img.onerror = ()=>{
       const fb = document.createElement('div');
       fb.className = 'logo-fallback';
       fb.textContent = initials(l.name);
+      fb.setAttribute('role','img');
+      fb.setAttribute('aria-label', l.name);
       img.replaceWith(fb);
     };
 
@@ -264,7 +315,7 @@ renderLogos();
 
 function scrollAmount(){
   const card = logoTrack.querySelector('.logo-card');
-  const gap  = parseFloat(getComputedStyle(logoTrack).gap) || 18;
+  const gap  = parseFloat(getComputedStyle(logoTrack).columnGap || getComputedStyle(logoTrack).gap) || 18;
   return card ? card.offsetWidth + gap : 300;
 }
 function updateSliderButtons(){
@@ -275,23 +326,25 @@ function updateSliderButtons(){
 /* arrows */
 sliderPrev.addEventListener('click', ()=> logoTrack.scrollBy({ left:-scrollAmount()*2, behavior:'smooth' }));
 sliderNext.addEventListener('click', ()=> logoTrack.scrollBy({ left: scrollAmount()*2, behavior:'smooth' }));
-logoTrack.addEventListener('scroll', updateSliderButtons);
+logoTrack.addEventListener('scroll', updateSliderButtons, { passive:true });
 window.addEventListener('resize', updateSliderButtons);
 setTimeout(updateSliderButtons, 50);
 
-/* autoplay: loops back to start, pauses on hover/touch */
-let paused = false;
-setInterval(()=>{
-  if(paused) return;
-  const max = logoTrack.scrollWidth - logoTrack.clientWidth;
-  if(max <= 4) return; /* everything already fits */
-  if(logoTrack.scrollLeft >= max - 4) logoTrack.scrollTo({ left:0, behavior:'smooth' });
-  else logoTrack.scrollBy({ left:scrollAmount(), behavior:'smooth' });
-}, 2800);
+/* autoplay: loops back to start, pauses on hover/touch/focus/hidden tab, off for reduced motion */
+let paused = false, touchTimer;
+if(!prefersReducedMotion){
+  setInterval(()=>{
+    if(paused || document.hidden || isDown) return;
+    const max = logoTrack.scrollWidth - logoTrack.clientWidth;
+    if(max <= 4) return; /* everything already fits */
+    if(logoTrack.scrollLeft >= max - 4) logoTrack.scrollTo({ left:0, behavior:'smooth' });
+    else logoTrack.scrollBy({ left:scrollAmount(), behavior:'smooth' });
+  }, 2800);
+}
 logoTrack.addEventListener('mouseenter', ()=> paused = true);
 logoTrack.addEventListener('mouseleave', ()=> paused = false);
-logoTrack.addEventListener('touchstart', ()=> paused = true, { passive:true });
-logoTrack.addEventListener('touchend',   ()=> setTimeout(()=> paused = false, 2500));
+logoTrack.addEventListener('touchstart', ()=>{ paused = true; clearTimeout(touchTimer); }, { passive:true });
+logoTrack.addEventListener('touchend',   ()=>{ clearTimeout(touchTimer); touchTimer = setTimeout(()=> paused = false, 3500); }, { passive:true });
 
 /* mouse drag-to-scroll (touch already swipes natively) */
 let isDown = false, startX = 0, startLeft = 0;
@@ -319,14 +372,14 @@ const rosterCount  = document.getElementById('rosterCount');
 
 function renderRoster(){
   clientGrid.innerHTML = projects.map((p,i)=>`
-    <div class="client-tile" data-industry="${p.cat}" data-project="${i}">
+    <div class="client-tile" data-industry="${esc(p.cat)}" data-project="${i}" role="button" tabindex="0" aria-label="Open case study: ${esc(p.title)}">
       <div class="top">
-        <div class="initial" style="background:${rosterColors[i % rosterColors.length]};">${initials(p.title)}</div>
-        <div class="arrow">↗</div>
+        <div class="initial" style="background:${rosterColors[i % rosterColors.length]};" aria-hidden="true">${esc(initials(p.title))}</div>
+        <div class="arrow" aria-hidden="true">↗</div>
       </div>
       <div>
-        <h4 class="display">${p.title}</h4>
-        <div class="meta">${p.cat}<span class="dot">·</span>${p.role}<span class="dot">·</span>${p.year}</div>
+        <h4 class="display">${esc(p.title)}</h4>
+        <div class="meta">${esc(p.cat)}<span class="dot">·</span>${esc(p.role)}<span class="dot">·</span>${esc(p.year)}</div>
       </div>
     </div>
   `).join('');
@@ -336,8 +389,12 @@ renderRoster();
 document.getElementById('industryFilters').addEventListener('click', e=>{
   const btn = e.target.closest('button');
   if(!btn) return;
-  document.querySelectorAll('#industryFilters button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#industryFilters button').forEach(b=>{
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed','false');
+  });
   btn.classList.add('active');
+  btn.setAttribute('aria-pressed','true');
   const f = btn.dataset.filter;
   let visible = 0;
   document.querySelectorAll('.client-tile').forEach(tile=>{
@@ -349,9 +406,14 @@ document.getElementById('industryFilters').addEventListener('click', e=>{
 });
 
 /* ---------- scroll reveal (runs last so it sees every rendered element) ---------- */
-const io = new IntersectionObserver(entries=>{
-  entries.forEach(en=>{
-    if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
-  });
-},{ threshold:.15 });
-document.querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el));
+if('IntersectionObserver' in window && !prefersReducedMotion){
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  },{ threshold:.12, rootMargin:'0px 0px -4% 0px' });
+  document.querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el));
+}else{
+  /* no observer / reduced motion: just show everything */
+  document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in'));
+}

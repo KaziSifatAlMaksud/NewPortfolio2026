@@ -2,96 +2,481 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Flash Innovation — Case Study</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  /* ---------- Tokens ---------- */
+  :root {
+    --bg: #0F1115;
+    --text: #ECE9E2;
+    --muted: #888C97;
+    --line: #262A33;
+    --accent: #3D5AFE;
+    --accent-soft: #B9C2FF;
+    --label: #96A87E;
+    --hero-fallback: #1A1408;
+
+    --gutter: 40px;          /* side padding */
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  /* ---------- Base ---------- */
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+  }
+
+  img { max-width: 100%; }
+
+  a:focus-visible {
+    outline: 2px solid var(--accent-soft);
+    outline-offset: 3px;
+  }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 26px var(--gutter);
+    padding-top: calc(26px + env(safe-area-inset-top, 0px));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: linear-gradient(to bottom, rgba(15,17,21,.85), rgba(15,17,21,0));
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+  }
+  .logo span { color: var(--accent); }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #fff;
+    background: rgba(255,255,255,.04);
+    border: 1px solid #fff;
+    border-radius: 999px;
+    padding: 9px 18px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    height: 56vh;
+    min-height: 360px;
+    position: relative;
+    overflow: hidden;
+    background-image: url('flash_innovation/flash_inn_cover.png');
+    background-size: cover;
+    background-position: center;
+    background-color: var(--hero-fallback);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, var(--bg), transparent 55%);
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(236,233,226,.16);
+    backdrop-filter: blur(10px) saturate(140%);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    border-radius: 999px;
+    padding: 6px 13px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+    position: absolute;
+    top: 110px;
+    left: var(--gutter);
+    z-index: 2;
+  }
+
+  /* ---------- Layout wrapper ---------- */
+  .wrap {
+    width: 100%;
+    max-width: 1640px;
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+
+  /* ---------- Header ---------- */
+  .page-header {
+    padding: 34px 0 30px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4.4vw, 54px);
+    font-weight: 600;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .meta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+  }
+  .meta-item { font-size: 13px; }
+
+  .meta-label {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(236,233,226,.14);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--label);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 8px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    display: inline-block;
+  }
+
+  /* ---------- Body: text + gallery ---------- */
+  .content {
+    padding: 46px 0 60px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 60px;
+  }
+
+  .content-text {
+    flex: 1 1 380px;
+    min-width: 0;
+  }
+  .content-text p {
+    color: var(--muted);
+    line-height: 1.85;
+    font-size: 16px;
+    margin: 0 0 18px 0;
+  }
+  .content-text p:last-child { margin-bottom: 0; }
+
+  .content-gallery {
+    flex: 1 1 460px;
+    min-width: 0;
+    display: grid;
+    gap: 18px;
+  }
+  .content-gallery:empty { display: none; }
+
+  .gallery-item {
+    border-radius: 14px;
+    height: 260px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ---------- Screenshot strip ---------- */
+  .shots {
+    display: grid;
+    gap: 18px;
+    padding-bottom: 60px;
+  }
+  .shots img {
+    width: 100%;
+    height: auto;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    display: block;
+  }
+
+  /* ---------- Next project ---------- */
+  .next {
+    border-top: 1px solid var(--line);
+    padding: 56px 0 90px;
+  }
+  .next-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .next-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 30px 34px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .next-card h3 {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 3vw, 34px);
+    font-weight: 600;
+    letter-spacing: -.02em;
+    line-height: 1.2;
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .next-arrow {
+    flex: 0 0 auto;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    font-size: 18px;
+  }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    width: 100%;
+    max-width: 1640px;
+    margin: 0 auto;
+    padding: 44px var(--gutter) 46px;
+    padding-bottom: calc(46px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+  .mail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 12px 22px;
+    font-size: 14px;
+    color: var(--text);
+    text-decoration: none;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .footer small {
+    font-family: var(--font-mono);
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  /* =====================================================
+     RESPONSIVE
+     ===================================================== */
+
+  /* Large desktops: keep it comfortable */
+  @media (min-width: 1400px) {
+    .content-text p { font-size: 17px; }
+  }
+
+  /* Tablet landscape / small laptop */
+  @media (max-width: 1024px) {
+    :root { --gutter: 32px; }
+    .content { gap: 40px; }
+  }
+
+  /* Tablet portrait: stack text and gallery */
+  @media (max-width: 860px) {
+    :root { --gutter: 28px; }
+
+    .hero { height: 48vh; min-height: 320px; }
+    .hero-tag { top: 96px; }
+
+    .content { padding: 36px 0 44px; gap: 32px; }
+    .content-text,
+    .content-gallery { flex: 1 1 100%; }
+
+    .shots { padding-bottom: 44px; }
+    .next { padding: 44px 0 64px; }
+  }
+
+  /* Phones */
+  @media (max-width: 600px) {
+    :root { --gutter: 20px; }
+
+    .nav { padding-top: calc(16px + env(safe-area-inset-top, 0px)); padding-bottom: 16px; }
+    .logo { font-size: 15px; }
+    .back-link { font-size: 11px; padding: 8px 14px; }
+
+    .hero { height: 40vh; min-height: 280px; }
+    .hero-tag { top: 84px; font-size: 10px; padding: 5px 11px; }
+
+    .page-header {
+      padding: 26px 0 24px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
+    }
+    .meta { gap: 10px 16px; width: 100%; }
+
+    .content { padding: 28px 0 36px; }
+    .content-text p { font-size: 15px; line-height: 1.75; }
+
+    .gallery-item { height: 200px; border-radius: 12px; }
+    .shots { gap: 14px; padding-bottom: 36px; }
+    .shots img { border-radius: 10px; }
+
+    .next { padding: 36px 0 52px; }
+    .next-card { padding: 20px; border-radius: 14px; gap: 14px; }
+    .next-arrow { width: 40px; height: 40px; font-size: 16px; }
+
+    .footer {
+      padding-top: 32px;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .mail-link { padding: 11px 18px; font-size: 13px; }
+  }
+
+  /* Very small phones */
+  @media (max-width: 360px) {
+    :root { --gutter: 16px; }
+    .back-link { padding: 7px 12px; letter-spacing: .02em; }
+  }
+
+  /* Short landscape phones: don't let the hero eat the screen */
+  @media (max-height: 480px) and (orientation: landscape) {
+    .hero { height: 70vh; min-height: 220px; }
+    .hero-tag { top: 76px; }
+  }
+</style>
 </head>
-<body style="margin:0;padding:0;background:#0F1115;color:#ECE9E2;font-family:'Inter',sans-serif;overflow-x:hidden;">
+<body>
 
 <!-- NAV -->
-<nav style="position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:26px 40px;backdrop-filter:blur(10px);background:linear-gradient(to bottom, rgba(15,17,21,.85), rgba(15,17,21,0));">
-  <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;letter-spacing:-.01em;">KS AL MAKSUD<span style="color:#3D5AFE;">.</span></div>
-  <a href="index.html" style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:rgba(255,255,255,.04);border:1px solid #fff;border-radius:999px;padding:9px 18px;text-decoration:none;">← Back to work</a>
+<nav class="nav">
+  <div class="logo">KS AL MAKSUD<span>.</span></div>
+  <a class="back-link" href="index.html">← Back to work</a>
 </nav>
 
 <!-- HERO -->
-<div style="height:56vh;min-height:360px;position:relative;overflow:hidden;background-image:url('flash_innovation/flash_inn_cover.png');background-size:cover;background-position:center;background-color:#1A1408;">
-  <div style="position:absolute;inset:0;background:linear-gradient(to top, #0F1115, transparent 55%);"></div>
-  <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid rgba(236,233,226,.16);backdrop-filter:blur(10px) saturate(140%);border-radius:999px;padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#B9C2FF;position:absolute;top:110px;left:40px;z-index:2;">01 · Web Development</span>
+<div class="hero">
+  <span class="hero-tag">01 · Web Development</span>
 </div>
 
 <!-- BODY WRAP -->
-<div style="width:100%;max-width:1640px;margin:0 auto;padding:0 40px;">
+<div class="wrap">
 
   <!-- HEADER -->
-  <div style="padding:34px 0 30px;border-bottom:1px solid #262A33;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px;">
-    <h1 style="font-family:'Space Grotesk',sans-serif;font-size:clamp(30px,4.4vw,54px);font-weight:600;letter-spacing:-.02em;margin:0;">Flash Innovation</h1>
-    <div style="display:flex;gap:14px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;">
-      <div style="font-size:13px;">
-        <span style="background:rgba(255,255,255,.04);border:1px solid rgba(236,233,226,.14);backdrop-filter:blur(8px);color:#96A87E;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding:5px 11px;border-radius:999px;display:inline-block;">Role</span>
+  <header class="page-header">
+    <h1 class="page-title">Flash Innovation</h1>
+    <div class="meta">
+      <div class="meta-item">
+        <span class="meta-label">Role</span>
         <span>Product &amp; Web Designer</span>
       </div>
-      <div style="font-size:13px;">
-        <span style="background:rgba(255,255,255,.04);border:1px solid rgba(236,233,226,.14);backdrop-filter:blur(8px);color:#96A87E;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding:5px 11px;border-radius:999px;display:inline-block;">Year</span>
+      <div class="meta-item">
+        <span class="meta-label">Year</span>
         <span>2026</span>
       </div>
-      <div style="font-size:13px;">
-        <span style="background:rgba(255,255,255,.04);border:1px solid rgba(236,233,226,.14);backdrop-filter:blur(8px);color:#96A87E;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding:5px 11px;border-radius:999px;display:inline-block;">Category</span>
+      <div class="meta-item">
+        <span class="meta-label">Category</span>
         <span>Web Design</span>
       </div>
     </div>
-  </div>
+  </header>
 
   <!-- BODY: TEXT + GALLERY -->
-  <div style="padding:46px 0 60px;display:flex;flex-wrap:wrap;gap:60px;">
+  <div class="content">
 
-    <div style="flex:1 1 380px;">
-      <p style="color:#888C97;line-height:1.85;font-size:16px;margin:0 0 18px 0;">
+    <div class="content-text">
+      <p>
         Flash Innovation approached me to rebuild their marketing site ahead of a product launch, moving away from a static one-pager toward a system that could scale as new features shipped.
       </p>
-      <p style="color:#888C97;line-height:1.85;font-size:16px;margin:0 0 18px 0;">
+      <p>
         I designed a modular content architecture — reusable section templates, a flexible image gallery, and a component-driven build — so the team could publish updates without waiting on a developer each time.
       </p>
-      <p style="color:#888C97;line-height:1.85;font-size:16px;margin:0;">
+      <p>
         The new site cut page-load time significantly and gave the team a consistent visual language across every launch asset.
       </p>
     </div>
 
-    <div style="flex:1 1 460px;display:grid;gap:18px;">
-      <!-- <div style="border-radius:14px;height:260px;overflow:hidden;border:1px solid #262A33;">
-        <img src="flash_innovation/gallery1.jpg" alt="Flash Innovation gallery 1" style="width:100%;height:100%;object-fit:cover;display:block;">
+    <div class="content-gallery">
+      <!-- <div class="gallery-item">
+        <img src="flash_innovation/gallery1.jpg" alt="Flash Innovation gallery 1">
       </div>
-      <div style="border-radius:14px;height:260px;overflow:hidden;border:1px solid #262A33;">
-        <img src="flash_innovation/gallery2.jpg" alt="Flash Innovation gallery 2" style="width:100%;height:100%;object-fit:cover;display:block;">
+      <div class="gallery-item">
+        <img src="flash_innovation/gallery2.jpg" alt="Flash Innovation gallery 2">
       </div> -->
     </div>
 
   </div>
 
   <!-- EXTRA IMAGE STRIP -->
-  <div style="display:grid;gap:18px;padding-bottom:60px;">
-    <img src="flash_innovation/1.png" alt="Flash Innovation screenshot 1" style="width:100%;height:auto;border-radius:14px;border:1px solid #262A33;display:block;">
-    <img src="flash_innovation/2.png" alt="Flash Innovation screenshot 2" style="width:100%;height:auto;border-radius:14px;border:1px solid #262A33;display:block;">
-    <img src="flash_innovation/3.png" alt="Flash Innovation screenshot 3" style="width:100%;height:auto;border-radius:14px;border:1px solid #262A33;display:block;">
+  <div class="shots">
+    <img src="flash_innovation/1.png" alt="Flash Innovation screenshot 1" loading="lazy">
+    <img src="flash_innovation/2.png" alt="Flash Innovation screenshot 2" loading="lazy">
+    <img src="flash_innovation/3.png" alt="Flash Innovation screenshot 3" loading="lazy">
   </div>
 
   <!-- NEXT PROJECT -->
-  <div style="border-top:1px solid #262A33;padding:56px 0 90px;">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#888C97;margin-bottom:18px;">Next project</div>
-    <a href="flash_painting_details.html" style="display:flex;justify-content:space-between;align-items:center;gap:20px;padding:30px 34px;border:1px solid #262A33;border-radius:18px;text-decoration:none;color:#ECE9E2;">
-      <h3 style="font-family:'Space Grotesk',sans-serif;font-size:clamp(22px,3vw,34px);font-weight:600;letter-spacing:-.02em;margin:0;">Flash Painting Co. — Official website</h3>
-      <span style="flex:0 0 auto;width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid #262A33;font-size:18px;">↗</span>
+  <div class="next">
+    <div class="next-label">Next project</div>
+    <a class="next-card" href="flash_painting_details.html">
+      <h3>Flash Painting Co. — Official website</h3>
+      <span class="next-arrow">↗</span>
     </a>
   </div>
 
 </div>
 
 <!-- FOOTER -->
-<footer style="width:100%;max-width:1640px;margin:0 auto;padding:44px 40px 46px;border-top:1px solid #262A33;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;">
-  <a href="mailto:kazi.sifat2013@gmail.com" style="display:inline-flex;align-items:center;gap:10px;border:1px solid #262A33;border-radius:999px;padding:12px 22px;font-size:14px;color:#ECE9E2;text-decoration:none;">kazi.sifat2013@gmail.com ↗</a>
-  <small style="font-family:'IBM Plex Mono',monospace;color:#888C97;font-size:12px;">© 2026 — Kazi Sifat Al Maksud</small>
+<footer class="footer">
+  <a class="mail-link" href="mailto:kazi.sifat2013@gmail.com">kazi.sifat2013@gmail.com ↗</a>
+  <small>© 2026 — Kazi Sifat Al Maksud</small>
 </footer>
 
 </body>

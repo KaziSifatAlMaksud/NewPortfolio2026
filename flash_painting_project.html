@@ -2,12 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F1115">
 <title>Case Study — Kazi Sifat Al Maksud</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  /* =====================================================
+     TOKENS
+     ===================================================== */
   :root{
     --bg:#0F1115;
     --panel:#161920;
@@ -20,22 +24,55 @@
     --tag:#96A87E;
     --radius:18px;
     --ease:cubic-bezier(.22,1,.36,1);
+
+    --gutter:40px;
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+    --safe-left:env(safe-area-inset-left,0px);
+    --safe-right:env(safe-area-inset-right,0px);
   }
 
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  /* =====================================================
+     BASE
+     ===================================================== */
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
   body{
     background:var(--bg);
     color:var(--text);
     font-family:'Inter',sans-serif;
     overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
   }
   ::selection{background:var(--accent);color:#fff;}
+  img{max-width:100%;display:block;}
+  a{color:inherit;text-decoration:none;}
   .display{font-family:'Space Grotesk',sans-serif;}
   .mono{font-family:'IBM Plex Mono',monospace;}
-  a{color:inherit;text-decoration:none;}
 
-  /* ---------- ambient background animation ---------- */
+  a:focus-visible{
+    outline:2px solid var(--accent-soft);
+    outline-offset:3px;
+  }
+
+  .skip-link{
+    position:absolute;left:-9999px;top:8px;z-index:100;
+    background:var(--accent);color:#fff;padding:10px 16px;border-radius:999px;
+    font-size:13px;
+  }
+  .skip-link:focus{left:16px;}
+
+  .wrap{
+    width:100%;
+    max-width:1640px;
+    margin:0 auto;
+    padding-left:calc(var(--gutter) + var(--safe-left));
+    padding-right:calc(var(--gutter) + var(--safe-right));
+  }
+
+  /* =====================================================
+     AMBIENT BACKGROUND
+     ===================================================== */
   .bg-ambient{
     position:fixed;
     inset:0;
@@ -76,50 +113,35 @@
     position:absolute;inset:0;
     background:radial-gradient(circle at 50% 0%, transparent 0%, var(--bg) 78%);
   }
-  @keyframes drift1{
-    0%{ transform:translate(0,0) scale(1); }
-    100%{ transform:translate(90px,70px) scale(1.2); }
-  }
-  @keyframes drift2{
-    0%{ transform:translate(0,0) scale(1); }
-    100%{ transform:translate(-70px,-60px) scale(1.15); }
-  }
-  @keyframes drift3{
-    0%{ transform:translate(0,0) scale(1); }
-    100%{ transform:translate(-50px,60px) scale(1.1); }
-  }
-  @media (prefers-reduced-motion:reduce){
-    .bg-ambient .blob{ animation:none; }
-  }
+  @keyframes drift1{ to{ transform:translate(90px,70px) scale(1.2); } }
+  @keyframes drift2{ to{ transform:translate(-70px,-60px) scale(1.15); } }
+  @keyframes drift3{ to{ transform:translate(-50px,60px) scale(1.1); } }
 
-  .wrap{
-    width:100%;
-    max-width:1640px;
-    margin:0 auto;
-    padding:0 40px;
-  }
-  @media (max-width:700px){ .wrap{padding:0 22px;} }
-
+  /* =====================================================
+     ENTRANCE
+     ===================================================== */
   .fade-item{
     opacity:0;
     transform:translateY(16px);
-    animation:fadeInUp .7s var(--ease) forwards;
+    animation:fadeInUp .7s var(--ease) var(--d,.1s) forwards;
   }
-  .fade-item:nth-of-type(1){animation-delay:.1s;}
-  .fade-item:nth-of-type(2){animation-delay:.2s;}
   @keyframes fadeInUp{ to{ opacity:1; transform:translateY(0);} }
 
-  /* ---------- nav ---------- */
-  nav{
+  /* =====================================================
+     NAV
+     ===================================================== */
+  .site-nav{
     position:fixed;top:0;left:0;right:0;
     z-index:60;
     display:flex;align-items:center;justify-content:space-between;
-    padding:26px 40px;
+    gap:12px;
+    padding:26px calc(var(--gutter) + var(--safe-right)) 26px calc(var(--gutter) + var(--safe-left));
+    padding-top:calc(26px + var(--safe-top));
     backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
     background:linear-gradient(to bottom, rgba(15,17,21,.85), rgba(15,17,21,0));
   }
-  @media (max-width:700px){ nav{padding:20px 22px;} }
-  .mark{ font-size:18px; font-weight:700; letter-spacing:-.01em; }
+  .mark{ font-size:18px; font-weight:700; letter-spacing:-.01em; white-space:nowrap; }
   .mark span{ color:var(--accent); }
 
   .back-link{
@@ -135,19 +157,24 @@
     border:1px solid var(--line);
     border-radius:999px;
     padding:9px 18px;
+    white-space:nowrap;
     transition:border-color .3s var(--ease), color .3s var(--ease);
   }
-  .back-link:hover{ border-color:var(--accent); color:var(--accent-soft); }
 
-  /* ---------- hero ---------- */
+  /* =====================================================
+     HERO
+     ===================================================== */
   .p-hero{
     height:56vh;
     min-height:360px;
-    margin-top:0;
     position:relative;
     overflow:hidden;
   }
-  .p-hero .art{ position:absolute; inset:-8%; }
+  .p-hero .art{
+    position:absolute; inset:-8%;
+    background-size:cover;
+    background-position:center;
+  }
   .p-hero::after{
     content:"";
     position:absolute;inset:0;
@@ -170,12 +197,15 @@
     text-transform:uppercase;
     color:var(--accent-soft);
     position:absolute;
-    top:110px;left:40px;
+    top:calc(110px + var(--safe-top));
+    left:calc(var(--gutter) + var(--safe-left));
     z-index:2;
+    max-width:calc(100% - (var(--gutter) * 2));
   }
-  @media (max-width:700px){ .glass-label{ left:22px; top:100px; } }
 
-  /* ---------- header ---------- */
+  /* =====================================================
+     HEADER
+     ===================================================== */
   .cs-header{
     padding:34px 0 30px;
     border-bottom:1px solid var(--line);
@@ -183,15 +213,18 @@
     justify-content:space-between;
     align-items:flex-end;
     flex-wrap:wrap;
-    gap:20px;
+    gap:20px 30px;
   }
   .cs-header h1{
     font-size:clamp(30px,4.4vw,54px);
     font-weight:600;
     letter-spacing:-.02em;
+    line-height:1.1;
+    overflow-wrap:anywhere;
+    min-width:0;
   }
   .cs-meta{ display:flex; gap:14px; flex-wrap:wrap; }
-  .cs-meta div{ font-size:13px; }
+  .cs-meta > div{ font-size:13px; }
   .cs-meta .label{
     font-family:'IBM Plex Mono',monospace;
     background:rgba(255,255,255,.04);
@@ -207,43 +240,72 @@
     display:inline-block;
   }
 
-  /* ---------- body ---------- */
+  /* =====================================================
+     BODY
+     ===================================================== */
   .cs-body{
     padding:46px 0 60px;
     display:grid;
-    grid-template-columns:1.1fr 1.6fr;
+    grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr);
     gap:60px;
+    align-items:start;
   }
-  @media (max-width:820px){ .cs-body{grid-template-columns:1fr; gap:30px;} }
-  .cs-body p{
+  .cs-text p{
     color:var(--muted);
     line-height:1.85;
     font-size:16px;
     margin-bottom:18px;
+    max-width:65ch;
   }
-  .cs-gallery{ display:grid; gap:18px; }
+  .cs-text p:last-child{ margin-bottom:0; }
+
+  .cs-gallery{ display:grid; gap:18px; min-width:0; }
   .cs-gallery .art-block{
     border-radius:14px;
-    height:260px;
+    height:clamp(180px, 22vw, 280px);
     position:relative;
     overflow:hidden;
     border:1px solid var(--line);
   }
   .cs-gallery .art-block .art{ position:absolute; inset:-8%; }
 
-  /* ---------- next project ---------- */
-  .next-project{
+  /* ---------- screenshot strip ---------- */
+  .shots{
+    display:grid;
+    gap:18px;
+    padding-bottom:60px;
+    width:100%;
+  }
+  .shots:empty{ display:none; }
+  .shots img{
+    width:100%;
+    height:auto;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:var(--panel);
+  }
+
+  /* =====================================================
+     PROJECT NAVIGATION (previous / next)
+     ===================================================== */
+  .project-nav{
     border-top:1px solid var(--line);
     padding:56px 0 90px;
   }
-  .next-project .eyebrow{
-    font-family:'IBM Plex Mono',monospace;
+  .project-nav .eyebrow{
     font-size:12px;
     letter-spacing:.12em;
     text-transform:uppercase;
     color:var(--muted);
     margin-bottom:18px;
   }
+  .project-nav-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+  }
+  .project-nav-grid.single{ grid-template-columns:1fr; }
+
   .next-card{
     display:flex;
     justify-content:space-between;
@@ -252,13 +314,24 @@
     padding:30px 34px;
     border:1px solid var(--line);
     border-radius:var(--radius);
+    min-width:0;
     transition:border-color .35s var(--ease), transform .35s var(--ease);
   }
-  .next-card:hover{ border-color:var(--accent); transform:translateY(-3px); }
+  .next-card .copy{ min-width:0; }
+  .next-card .dir{
+    display:block;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
   .next-card h3{
-    font-size:clamp(22px,3vw,34px);
+    font-size:clamp(20px,2.4vw,30px);
     font-weight:600;
     letter-spacing:-.02em;
+    line-height:1.2;
+    overflow-wrap:anywhere;
   }
   .next-card .arrow{
     flex:0 0 auto;
@@ -269,19 +342,21 @@
     font-size:18px;
     transition:transform .35s var(--ease), background .35s var(--ease), border-color .35s var(--ease);
   }
-  .next-card:hover .arrow{ transform:translate(4px,-4px); background:var(--accent); border-color:var(--accent); }
 
-  /* ---------- footer ---------- */
-  footer{
-    border-top:1px solid var(--line);
-    padding:44px 0 46px;
+  /* =====================================================
+     FOOTER
+     ===================================================== */
+  .site-footer{ border-top:1px solid var(--line); }
+  .footer-inner{
+    padding-top:44px;
+    padding-bottom:calc(46px + var(--safe-bottom));
     display:flex;
     justify-content:space-between;
     align-items:center;
     flex-wrap:wrap;
     gap:18px;
   }
-  footer .contact-link{
+  .contact-link{
     display:inline-flex;
     align-items:center;
     gap:10px;
@@ -289,13 +364,133 @@
     border-radius:999px;
     padding:12px 22px;
     font-size:14px;
+    max-width:100%;
+    overflow-wrap:anywhere;
     transition:border-color .3s var(--ease), color .3s var(--ease);
   }
-  footer .contact-link:hover{ border-color:var(--accent); color:var(--accent-soft); }
-  footer small{ color:var(--muted); font-size:12px; }
+  .footer-inner small{ color:var(--muted); font-size:12px; }
+
+  /* =====================================================
+     HOVER (only on devices that really hover)
+     ===================================================== */
+  @media (hover:hover){
+    .back-link:hover{ border-color:var(--accent); color:var(--accent-soft); }
+    .next-card:hover{ border-color:var(--accent); transform:translateY(-3px); }
+    .next-card:hover .arrow{ transform:translate(4px,-4px); background:var(--accent); border-color:var(--accent); }
+    .contact-link:hover{ border-color:var(--accent); color:var(--accent-soft); }
+  }
+  .next-card:active{ border-color:var(--accent); }
+
+  /* =====================================================
+     RESPONSIVE
+     ===================================================== */
+
+  /* Large screens */
+  @media (min-width:1400px){
+    .cs-text p{ font-size:17px; }
+  }
+
+  /* Small laptop / tablet landscape */
+  @media (max-width:1100px){
+    :root{ --gutter:32px; }
+    .cs-body{ gap:40px; }
+  }
+
+  /* Tablet portrait: single column, gallery becomes two across */
+  @media (max-width:900px){
+    :root{ --gutter:28px; }
+
+    .p-hero{ height:48vh; min-height:320px; }
+    .glass-label{ top:calc(96px + var(--safe-top)); }
+
+    .cs-body{
+      grid-template-columns:1fr;
+      gap:32px;
+      padding:36px 0 44px;
+    }
+    .cs-text p{ max-width:none; }
+    .cs-gallery{ grid-template-columns:1fr 1fr; }
+    .cs-gallery .art-block{ height:clamp(150px, 28vw, 240px); }
+
+    .shots{ padding-bottom:44px; }
+    .project-nav{ padding:44px 0 64px; }
+    .next-card{ padding:24px 26px; }
+  }
+
+  /* Phones */
+  @media (max-width:640px){
+    :root{ --gutter:20px; }
+
+    /* ambient blobs: lighter and smaller for mobile GPUs */
+    .bg-ambient .blob{ filter:blur(70px); }
+    .bg-ambient .b1{ width:340px; height:340px; }
+    .bg-ambient .b2{ width:300px; height:300px; }
+    .bg-ambient .b3{ width:260px; height:260px; }
+
+    .site-nav{
+      padding-top:calc(16px + var(--safe-top));
+      padding-bottom:16px;
+    }
+    .mark{ font-size:15px; }
+    .back-link{ font-size:11px; padding:8px 14px; }
+
+    .p-hero{ height:40vh; min-height:280px; }
+    .glass-label{ top:calc(84px + var(--safe-top)); font-size:10px; padding:5px 11px; }
+
+    .cs-header{
+      padding:26px 0 24px;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:18px;
+    }
+    .cs-meta{ gap:10px 16px; }
+
+    .cs-body{ padding:28px 0 36px; gap:26px; }
+    .cs-text p{ font-size:15px; line-height:1.75; }
+    .cs-gallery{ grid-template-columns:1fr; gap:14px; }
+    .cs-gallery .art-block{ height:clamp(160px, 46vw, 220px); border-radius:12px; }
+
+    .shots{ gap:14px; padding-bottom:36px; }
+    .shots img{ border-radius:10px; }
+
+    .project-nav{ padding:36px 0 52px; }
+    .project-nav-grid{ grid-template-columns:1fr; gap:14px; }
+    .next-card{ padding:20px; border-radius:14px; gap:14px; }
+    .next-card .arrow{ width:40px; height:40px; font-size:16px; }
+
+    .footer-inner{
+      padding-top:32px;
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    .contact-link{ padding:11px 18px; font-size:13px; }
+  }
+
+  /* Very small phones */
+  @media (max-width:360px){
+    :root{ --gutter:16px; }
+    .back-link{ padding:7px 12px; letter-spacing:.02em; }
+    .mark{ font-size:14px; }
+  }
+
+  /* Short landscape phones */
+  @media (max-height:480px) and (orientation:landscape){
+    .p-hero{ height:70vh; min-height:220px; }
+    .glass-label{ top:calc(76px + var(--safe-top)); }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion:reduce){
+    html{ scroll-behavior:auto; }
+    .bg-ambient .blob{ animation:none; }
+    .fade-item{ animation:none; opacity:1; transform:none; }
+    .next-card, .next-card .arrow{ transition:none; }
+  }
 </style>
 </head>
 <body>
+
+<a class="skip-link" href="#main">Skip to content</a>
 
 <div class="bg-ambient" aria-hidden="true">
   <span class="blob b1"></span>
@@ -303,18 +498,19 @@
   <span class="blob b3"></span>
 </div>
 
-<nav>
-  <div class="mark">KS AL MAKSUD<span>.</span></div>
+<nav class="site-nav" aria-label="Main">
+  <div class="mark display">KS AL MAKSUD<span>.</span></div>
   <a class="back-link" href="index.html">← Back to work</a>
 </nav>
 
-<div class="p-hero">
+<div class="p-hero" aria-hidden="true">
   <div class="art" id="pHero"></div>
-  <span class="glass-label" id="pBadge"></span>
 </div>
+<!-- label sits on the hero but is real content, so it lives outside the aria-hidden block -->
+<span class="glass-label" id="pBadge" style="position:absolute;"></span>
 
-<div class="wrap">
-  <div class="cs-header fade-item">
+<main id="main" class="wrap">
+  <div class="cs-header fade-item" style="--d:.1s">
     <h1 class="display" id="pTitle"></h1>
     <div class="cs-meta mono">
       <div><span class="label">Role</span><span id="pRole"></span></div>
@@ -324,32 +520,26 @@
   </div>
 
   <div class="cs-body">
-    <div class="fade-item" id="pText"></div>
-    <div class="cs-gallery fade-item">
+    <div class="cs-text fade-item" id="pText" style="--d:.2s"></div>
+    <div class="cs-gallery fade-item" style="--d:.3s" aria-hidden="true">
       <div class="art-block"><div class="art" id="pGal1"></div></div>
       <div class="art-block"><div class="art" id="pGal2"></div></div>
     </div>
   </div>
-  
-  <div class="flot-container fade-item" style="width: 100%;">
-      <!-- <div class="flot" id="pFlot" style="width: 100%;"></div> -->
-      <img src="flash_painting/1.png" style="width: 100%; height: auto;">
-      <img src="flash_painting/2.png" style="width: 100%; height: auto;">
-      <img src="flash_painting/3.png" style="width: 100%; height: auto;">
-  </div>
 
-  <div class="next-project">
-    <div class="eyebrow mono">Next project</div>
-    <a class="next-card" id="nextCard" href="#">
-      <h3 class="display" id="nextTitle"></h3>
-      <span class="arrow">↗</span>
-    </a>
-  </div>
-</div>
+  <div class="shots fade-item" id="pShots" style="--d:.4s"></div>
 
-<footer class="wrap">
-  <a class="contact-link mono" href="mailto:kazi.sifat2013@gmail.com">kazi.sifat2013@gmail.com ↗</a>
-  <small class="mono">© 2026 — Kazi Sifat Al Maksud</small>
+  <section class="project-nav" aria-label="More projects">
+    <div class="eyebrow mono">More projects</div>
+    <div class="project-nav-grid" id="projectNav"></div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <a class="contact-link mono" href="mailto:kazi.sifat2013@gmail.com">kazi.sifat2013@gmail.com ↗</a>
+    <small class="mono">© 2026 — Kazi Sifat Al Maksud</small>
+  </div>
 </footer>
 
 <script>
@@ -405,25 +595,102 @@ const projects = [
   }
 ];
 
+/* Screenshots shown under the text.
+   Give any project its own list with:  shots:["folder/1.png","folder/2.png"]
+   Projects without a `shots` list fall back to these (your original images). */
+const defaultShots = [
+  "flash_painting/1.png",
+  "flash_painting/2.png",
+  "flash_painting/3.png"
+];
+
+/* ---------- pick the project from ?id= ---------- */
 const params = new URLSearchParams(window.location.search);
 let id = parseInt(params.get('id'), 10);
-if(isNaN(id) || id < 0 || id >= projects.length) id = 0;
-const p = projects[id];
-const nextId = (id + 1) % projects.length;
-const np = projects[nextId];
+if (isNaN(id) || id < 0 || id >= projects.length) id = 0;
 
+const n = projects.length;
+const p = projects[id];
+const prevId = (id - 1 + n) % n;
+const nextId = (id + 1) % n;
+
+const $ = (sel) => document.getElementById(sel);
+
+/* ---------- head, hero, header ---------- */
 document.title = p.title + " — Case Study";
-document.getElementById('pHero').style.background = p.grad;
-document.getElementById('pBadge').textContent = String(id+1).padStart(2,'0') + ' · ' + p.cat;
-document.getElementById('pTitle').textContent = p.title;
-document.getElementById('pRole').textContent = p.role;
-document.getElementById('pYear').textContent = p.year;
-document.getElementById('pCat').textContent = p.cat;
-document.getElementById('pText').innerHTML = '<p>'+p.text+'</p>';
-document.getElementById('pGal1').style.background = p.grad;
-document.getElementById('pGal2').style.background = 'linear-gradient(60deg,'+p.grad.match(/#[0-9A-Fa-f]{6}/g).reverse().join(',')+')';
-document.getElementById('nextCard').href = 'project.html?id='+nextId;
-document.getElementById('nextTitle').textContent = np.title;
+
+const hero = $('pHero');
+hero.style.backgroundImage = p.image ? 'url("' + p.image + '"), ' + p.grad : p.grad;
+// if the cover image is missing the gradient layer is still painted underneath
+
+$('pBadge').textContent = String(id + 1).padStart(2, '0') + ' · ' + p.cat;
+$('pTitle').textContent = p.title;
+$('pRole').textContent = p.role;
+$('pYear').textContent = p.year;
+$('pCat').textContent = p.cat;
+
+/* ---------- text (blank line in the copy = new paragraph) ---------- */
+const textBox = $('pText');
+p.text.split(/\n\s*\n/).forEach(function (para) {
+  const el = document.createElement('p');
+  el.textContent = para.trim();
+  textBox.appendChild(el);
+});
+
+/* ---------- gallery art ---------- */
+$('pGal1').style.background = p.grad;
+const colors = p.grad.match(/#[0-9A-Fa-f]{6}/g) || [];
+$('pGal2').style.background = colors.length
+  ? 'linear-gradient(60deg,' + colors.slice().reverse().join(',') + ')'
+  : p.grad;
+
+/* ---------- screenshots ---------- */
+const shots = p.shots || defaultShots;
+const shotsBox = $('pShots');
+shots.forEach(function (src, i) {
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = p.title + ' — screenshot ' + (i + 1);
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  img.onerror = function () { img.remove(); };   // hide broken images
+  shotsBox.appendChild(img);
+});
+
+/* ---------- previous / next ---------- */
+function projectCard(project, targetId, label, arrow) {
+  const a = document.createElement('a');
+  a.className = 'next-card';
+  a.href = 'project.html?id=' + targetId;
+
+  const copy = document.createElement('div');
+  copy.className = 'copy';
+
+  const dir = document.createElement('span');
+  dir.className = 'dir mono';
+  dir.textContent = label;
+
+  const h3 = document.createElement('h3');
+  h3.className = 'display';
+  h3.textContent = project.title;
+
+  copy.appendChild(dir);
+  copy.appendChild(h3);
+
+  const ar = document.createElement('span');
+  ar.className = 'arrow';
+  ar.setAttribute('aria-hidden', 'true');
+  ar.textContent = arrow;
+
+  a.appendChild(copy);
+  a.appendChild(ar);
+  return a;
+}
+
+const nav = $('projectNav');
+if (n > 2) nav.appendChild(projectCard(projects[prevId], prevId, 'Previous project', '↖'));
+nav.appendChild(projectCard(projects[nextId], nextId, 'Next project', '↗'));
+if (n <= 2) nav.classList.add('single');
 </script>
 
 </body>

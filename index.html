@@ -14,7 +14,10 @@
     }
   })();
 </script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- viewport-fit=cover lets the page use the full screen on notched phones (CSS handles safe areas) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="Selected brand identity and product design work by Kazi Sifat Al Maksud.">
 <title>Kazi Sifat Al Maksud — Selected Work</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,10 +26,10 @@
 </head>
 <body>
 
-<div id="cursor"><span class="label">View</span></div>
+<div id="cursor" aria-hidden="true"><span class="label">View</span></div>
 
-<nav>
-  <div class="mark">KS AL MAKSUD<span>.</span></div>
+<nav aria-label="Main">
+  <a class="mark" href="index.html" aria-label="Kazi Sifat Al Maksud — home">KS AL MAKSUD<span>.</span></a>
 
   <div class="nav-right">
     <div class="navlinks" id="navlinks">
@@ -36,24 +39,25 @@
       <a href="contact.html">Contact Me</a>
     </div>
 
-    <button class="menu-toggle" id="menuToggle" aria-label="Open navigation">
+    <button type="button" class="menu-toggle" id="menuToggle" aria-label="Open navigation" aria-expanded="false" aria-controls="navlinks">
       <span></span><span></span><span></span>
     </button>
 
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode" title="Toggle light / dark mode">
-      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode" title="Toggle light / dark mode">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="12" cy="12" r="4"></circle>
         <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
       </svg>
-      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
       </svg>
     </button>
   </div>
 </nav>
 
+<main>
 <header class="hero">
-  <div class="hero-bg" id="heroBg">
+  <div class="hero-bg" id="heroBg" aria-hidden="true">
     <div class="orb orb1"></div>
     <div class="orb orb2"></div>
     <div class="orb orb3"></div>
@@ -66,20 +70,20 @@
       <span class="rowline"><span>chosen <em>carefully.</em></span></span>
     </h1>
     <p>Seven projects spanning brand identity and product design — each one built to solve a real problem for a real team, not to fill a grid.</p>
-    <div class="scrollcue"><div class="line"></div>Scroll</div>
+    <div class="scrollcue" aria-hidden="true"><div class="line"></div>Scroll</div>
   </div>
 </header>
 
 <div class="background_featured">
-  <section class="featured wrap">
+  <section class="featured wrap" aria-labelledby="featuredHeading">
     <div class="section-head reveal">
-      <h2>Featured case study</h2>
+      <h2 id="featuredHeading">Featured case study</h2>
       <span class="count" id="featuredCount">01 / 07</span>
     </div>
-    <div class="feature-card reveal" data-project="0">
+    <div class="feature-card reveal" data-project="0" role="button" tabindex="0" aria-label="Open featured case study">
       <div class="feature-thumb">
         <div class="art" id="featureArt"></div>
-        <svg class="noise" width="100%" height="100%"><filter id="n1"><feTurbulence baseFrequency="0.9" numOctaves="2" result="t"/><feColorMatrix in="t" type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n1)" opacity="0.15"/></svg>
+        <svg class="noise" width="100%" height="100%" aria-hidden="true"><filter id="n1"><feTurbulence baseFrequency="0.9" numOctaves="2" result="t"/><feColorMatrix in="t" type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n1)" opacity="0.15"/></svg>
         <span class="glass-label thumb-badge" style="margin:30px;color:#fff;" id="featureBadge">01 · Featured</span>
         <div class="feature-info">
           <div>
@@ -93,21 +97,21 @@
   </section>
 </div>
 
-<section class="grid-section wrap">
+<section class="grid-section wrap" aria-labelledby="moreHeading">
   <div class="section-head reveal">
-    <h2>More projects</h2>
+    <h2 id="moreHeading">More projects</h2>
     <span class="count" id="gridCount">02 – 07</span>
   </div>
   <div class="grid" id="grid"><!-- cards injected by JS --></div>
 </section>
 
 <div class="background_trusted">
-  <section class="slider-section wrap">
+  <section class="slider-section wrap" aria-labelledby="trustedHeading">
     <div class="slider-head reveal">
-      <h2>Trusted by</h2>
+      <h2 id="trustedHeading">Trusted by</h2>
       <div class="slider-nav">
-        <button id="sliderPrev" aria-label="Previous">←</button>
-        <button id="sliderNext" aria-label="Next">→</button>
+        <button type="button" id="sliderPrev" aria-label="Previous logos">←</button>
+        <button type="button" id="sliderNext" aria-label="Next logos">→</button>
       </div>
     </div>
     <div class="logo-viewport reveal">
@@ -117,15 +121,15 @@
 </div>
 
 <div class="background_roster">
-  <section class="roster-section wrap">
-    <div class="filters reveal" id="industryFilters">
-      <button class="active" data-filter="all">All</button>
-      <button data-filter="Branding">Branding</button>
-      <button data-filter="Product">Product</button>
+  <section class="roster-section wrap" aria-labelledby="rosterHeading">
+    <div class="filters reveal" id="industryFilters" role="group" aria-label="Filter by discipline">
+      <button type="button" class="active" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" data-filter="Branding" aria-pressed="false">Branding</button>
+      <button type="button" data-filter="Product" aria-pressed="false">Product</button>
     </div>
     <div class="roster-head reveal">
-      <h2>Full roster</h2>
-      <span class="roster-count mono" id="rosterCount">7 clients</span>
+      <h2 id="rosterHeading">Full roster</h2>
+      <span class="roster-count mono" id="rosterCount" aria-live="polite">7 clients</span>
     </div>
 
     <div class="client-grid" id="clientGrid"><!-- tiles injected by JS --></div>
@@ -138,6 +142,7 @@
     </div>
   </section>
 </div>
+</main>
 
 <footer class="wrap">
   <div class="big display">Have a project<br>in mind?</div>
@@ -145,8 +150,7 @@
   <small class="mono">© 2026 — Kazi Sifat Al Maksud</small>
 </footer>
 
-<div class="overlay" id="overlay">
-  <button class="close-btn" id="closeBtn">✕</button>
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="csTitle" aria-hidden="true">
   <div class="overlay-inner">
     <div class="overlay-hero" id="overlayHero"><div class="art" id="overlayArt"></div></div>
     <div class="wrap">
@@ -168,6 +172,9 @@
     </div>
   </div>
 </div>
+<!-- Close button lives OUTSIDE the overlay: a transformed parent would stop position:fixed from working,
+     so on long case studies the button used to scroll away with the content. -->
+<button type="button" class="close-btn" id="closeBtn" aria-label="Close case study">✕</button>
 
 <script src="home.js"></script>
 </body>
